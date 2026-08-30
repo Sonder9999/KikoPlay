@@ -741,7 +741,7 @@ win32 {
         LIBS += -L$$PWD/lib/x64/ -lonnxruntime
     }
     contains(DEFINES, KSERVICE) {
-        debug {
+        CONFIG(debug, debug|release) {
             LIBS += -L$$PWD/lib/x64/ -llibprotobuf-lited
         } else {
             LIBS += -L$$PWD/lib/x64/ -llibprotobuf-lite

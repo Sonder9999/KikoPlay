@@ -52,10 +52,9 @@ jobs:
         EOF
 
     - name: Build
-      shell: bash
+      shell: cmd
       run: |
-        set -e
-        qmake KikoPlay.pro
+        qmake KikoPlay.pro || exit /b 1
         jom -j4 release
 
     - name: Upload artifact

@@ -364,7 +364,11 @@ void PlayerWindow::initActions()
             GlobalObjects::mpvplayer->screenshot(tmpImg.fileName());
             QImage captureImage(tmpImg.fileName());
             const PlayListItem *curItem = GlobalObjects::playlist->getCurrentItem();
-            Capture captureDialog(captureImage,playPause,curItem);
+            QString videoDir;
+            QString curFile = GlobalObjects::mpvplayer->getCurrentFile();
+            if (!curFile.isEmpty() && QFileInfo(curFile).isFile())
+                videoDir = QFileInfo(curFile).absolutePath();
+            Capture captureDialog(captureImage,playPause,curItem,videoDir);
             QRect geo(captureDialog.geometry());
             geo.moveCenter(this->geometry().center());
             captureDialog.move(geo.topLeft());
@@ -2905,27 +2909,65 @@ void PlayerWindow::keyPressEvent(QKeyEvent *event)
             doublePressTimer.stop();
             altPressCount=0;
             const PlayListItem *curItem=GlobalObjects::playlist->getCurrentItem();
+            const QString curFile = GlobalObjects::mpvplayer->getCurrentFile();
+
+            int curTime=GlobalObjects::mpvplayer->getTime();
+            int cmin=curTime/60;
+            int cls=curTime-cmin*60;
+            QString timeTag=QString("%1:%2").arg(cmin,2,10,QChar('0')).arg(cls,2,10,QChar('0'));
+
+            // ====== Recognized video: save to library ======
             if(curItem && !curItem->animeTitle.isEmpty())
             {
-                int curTime=GlobalObjects::mpvplayer->getTime();
-                int cmin=curTime/60;
-                int cls=curTime-cmin*60;
-                QString info=QString("%1:%2 - %3").arg(cmin,2,10,QChar('0')).arg(cls,2,10,QChar('0')).arg(curItem->title);
+                QString info=QString("%1 - %2").arg(timeTag, curItem->title);
+
 #ifdef Q_OS_MAC
-                // mac 下 .app 启动时 cwd 通常为 /，相对路径模板会创建失败，
-                // 显式指定系统临时目录。
                 QTemporaryFile tmpImg(QDir::tempPath() + "/kikoXXXXXX.jpg");
 #else
                 QTemporaryFile tmpImg("XXXXXX.jpg");
 #endif
                 if(tmpImg.open())
                 {
-                    GlobalObjects::mpvplayer->screenshot(tmpImg.fileName());
+                    GlobalObjects::mpvplayer->screenshot(tmpImg.fileName(), "video");
                     QImage captureImage(tmpImg.fileName());
                     AnimeWorker::instance()->saveCapture(curItem->animeTitle, info, captureImage);
-                    showMessage(tr("Capture has been add to library: %1").arg(curItem->animeTitle));
                 }
+
+                if(GlobalObjects::mpvplayer->hasVisibleSubtitle())
+                {
+#ifdef Q_OS_MAC
+                    QTemporaryFile tmpImgSub(QDir::tempPath() + "/kikoXXXXXX.jpg");
+#else
+                    QTemporaryFile tmpImgSub("XXXXXX.jpg");
+#endif
+                    if(tmpImgSub.open())
+                    {
+                        GlobalObjects::mpvplayer->screenshot(tmpImgSub.fileName(), "subtitles");
+                        QImage captureImageSub(tmpImgSub.fileName());
+                        AnimeWorker::instance()->saveCapture(curItem->animeTitle,
+                            info + tr("[Subtitle]"), captureImageSub);
+                    }
+                }
+                showMessage(tr("Capture has been add to library: %1").arg(curItem->animeTitle));
             }
+            // ====== Unrecognized local video: auto-save to video directory ======
+            else if(!curFile.isEmpty() && QFileInfo(curFile).isFile())
+            {
+                QString videoDir = QFileInfo(curFile).absolutePath();
+                QString baseName = QFileInfo(curFile).completeBaseName();
+                QString fileName = QString("%1_%2").arg(baseName, timeTag);
+
+                QString path1 = QDir(videoDir).filePath(fileName + ".jpg");
+                GlobalObjects::mpvplayer->screenshot(path1, "video");
+
+                if(GlobalObjects::mpvplayer->hasVisibleSubtitle())
+                {
+                    QString path2 = QDir(videoDir).filePath(fileName + "_sub.jpg");
+                    GlobalObjects::mpvplayer->screenshot(path2, "subtitles");
+                }
+                showMessage(tr("Saved to: %1").arg(videoDir));
+            }
+            // ====== Network video or other: fallback to Capture dialog ======
             else
             {
                 actScreenshotSrc->trigger();

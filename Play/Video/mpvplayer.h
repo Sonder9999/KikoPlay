@@ -1,4 +1,4 @@
-﻿#ifndef MPVPLAYER_H
+#ifndef MPVPLAYER_H
 #define MPVPLAYER_H
 
 #include <QOpenGLWidget>
@@ -103,6 +103,7 @@ public:
     double getSubOutlineSize() const { return subOutlineSize; }
     QString getSubBorderStyle() const { return subBorderStyle; }
     bool getEnableEmbeddedWindow() const { return enableEmbeddedWindow; }
+    bool hasVisibleSubtitle() const;
 
     VideoSizeInfo getVideoSizeInfo();
     QString expandMediaInfo(const QString &text);
@@ -162,7 +163,7 @@ public slots:
     void clearExternalSub();
     void setSpeed(double speed);
     void setVideoAspect(int index);
-    void screenshot(const QString &filename);
+    void screenshot(const QString &filename, const QString &flags = "video");
     void setBrightness(int val);
     void setContrast(int val);
     void setSaturation(int val);

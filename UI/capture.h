@@ -8,7 +8,7 @@ class Capture : public CFramelessDialog
 {
     Q_OBJECT
 public:
-    Capture(QImage &captureImage, QWidget *parent = nullptr, const PlayListItem *item=nullptr);
+    Capture(QImage &captureImage, QWidget *parent = nullptr, const PlayListItem *item=nullptr, const QString &videoDir = QString());
 
 private:
     QWidget *buttonContainer;

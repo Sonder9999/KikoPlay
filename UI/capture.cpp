@@ -5,12 +5,14 @@
 #include <QApplication>
 #include <QClipboard>
 #include <QFileDialog>
+#include <QDir>
+#include <QDateTime>
 #include "UI/widgets/kpushbutton.h"
 #include "globalobjects.h"
 #include "MediaLibrary/animeworker.h"
 #include "Play/Video/mpvplayer.h"
 #include "Play/Playlist/playlistitem.h"
-Capture::Capture(QImage &captureImage, QWidget *parent, const PlayListItem *item) : CFramelessDialog("",parent)
+Capture::Capture(QImage &captureImage, QWidget *parent, const PlayListItem *item, const QString &videoDir) : CFramelessDialog("",parent)
 {
     setResizeable(false);
     imgLabel=new QLabel(this);
@@ -28,6 +30,16 @@ Capture::Capture(QImage &captureImage, QWidget *parent, const PlayListItem *item
     QObject::connect(copyToClipboard, &QPushButton::clicked, this, [&captureImage,this](){
        QApplication::clipboard()->setImage(captureImage);
        CFramelessDialog::onAccept();
+    });
+    QPushButton *saveToVideoDir = new KPushButton(tr("Save to Video Dir"), buttonContainer);
+    saveToVideoDir->setEnabled(!videoDir.isEmpty());
+    QObject::connect(saveToVideoDir, &QPushButton::clicked, this, [&captureImage, videoDir, this](){
+        if (videoDir.isEmpty()) return;
+        QString timestamp = QDateTime::currentDateTime().toString("yyyy-MM-dd_HH-mm-ss");
+        QString filePath = QDir(videoDir).filePath(
+            QString("screenshot_%1.jpg").arg(timestamp));
+        captureImage.save(filePath);
+        CFramelessDialog::onAccept();
     });
     QPushButton *saveToFile = new KPushButton(tr("Save"), buttonContainer);
     QObject::connect(saveToFile, &QPushButton::clicked, this, [this,&captureImage](){
@@ -51,6 +63,7 @@ Capture::Capture(QImage &captureImage, QWidget *parent, const PlayListItem *item
     });
     QHBoxLayout *btnHLayout = new QHBoxLayout(buttonContainer);
     btnHLayout->addWidget(copyToClipboard);
+    btnHLayout->addWidget(saveToVideoDir);
     btnHLayout->addWidget(addToLibrary);
     btnHLayout->addStretch(1);
     btnHLayout->addWidget(saveToFile);

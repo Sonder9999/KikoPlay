@@ -635,9 +635,17 @@ void MPVPlayer::setVideoAspect(int index)
     GlobalObjects::appSetting->setValue(SETTING_KEY_VIDEO_ASPECT, index);
 }
 
-void MPVPlayer::screenshot(const QString &filename)
+void MPVPlayer::screenshot(const QString &filename, const QString &flags)
 {
-    setMPVCommand(QVariantList() << "screenshot-to-file" << filename);
+    setMPVCommand(QVariantList() << "screenshot-to-file" << filename << flags);
+}
+
+bool MPVPlayer::hasVisibleSubtitle() const
+{
+    if (subTracks.isEmpty()) return false;
+    int sid = mpv::qt::get_property(mpv, "sid").toInt();
+    if (sid <= 0) return false;
+    return mpv::qt::get_property(mpv, "sub-visibility").toBool();
 }
 
 void MPVPlayer::setBrightness(int val)

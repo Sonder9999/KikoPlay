@@ -1,10 +1,13 @@
-name: Build KikoPlay Windows
+﻿name: Build KikoPlay Windows
 
 on:
   workflow_dispatch:
   push:
     branches:
       - fix/fullscreen-episode-switch
+      - '*'
+    tags:
+      - '*'
 
 env:
   QT_VERSION: "6.6.3"
@@ -34,8 +37,6 @@ jobs:
     - name: Install jom
       run: choco install jom -y
 
-    # KSERVICE 在 Windows 上恒开，Common/network.h 会 include 此头文件。
-    # 写空值即可通过编译（凭据由用户本地脚本/插件自行持有，不进仓库、不进 CI）。
     - name: Create empty secrets header
       shell: bash
       run: |
@@ -60,6 +61,6 @@ jobs:
     - name: Upload artifact
       uses: actions/upload-artifact@v4
       with:
-        name: KikoPlay-win64-fix-fullscreen
+        name: KikoPlay-win64-dual-screenshot
         path: release/KikoPlay.exe
         if-no-files-found: error

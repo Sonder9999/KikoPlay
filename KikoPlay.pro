@@ -23,7 +23,7 @@ DEFINES += QT_MESSAGELOGCONTEXT
 # deprecated API in order to know how to port your code away from it.
 DEFINES += QT_DEPRECATED_WARNINGS
 DEFINES += ZLIB_WINAPI
-DEFINES += KSERVICE
+# DEFINES += KSERVICE
 # KService relies on protobuf. On macOS protobuf is not linked by default, so
 # KService is only enabled when a protobuf 3.21.x install prefix is provided
 # through the KIKO_PROTOBUF_PREFIX environment variable (see the CI workflow).

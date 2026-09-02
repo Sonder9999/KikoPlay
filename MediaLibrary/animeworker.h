@@ -51,6 +51,7 @@ public:
     void modifyCharacter(const QString &animeName, const QString &srcCrtName, const Character &crtInfo);
     void removeCharacter(const QString &animeName, const QString &crtName);
 
+    void ensureAnimeExists(const QString &animeName);
     void saveCapture(const QString &animeName, const QString &info, const QImage &image);
     void saveSnippet(const QString &animeName, const QString &info, qint64 timeId, const QImage &image);
     const QPixmap getAnimeImageData(const QString &animeName, AnimeImage::ImageType type, qint64 timeId);

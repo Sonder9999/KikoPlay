@@ -708,6 +708,24 @@ void AnimeWorker::removeCharacter(const QString &animeName, const QString &crtNa
     });
 }
 
+void AnimeWorker::ensureAnimeExists(const QString &animeName)
+{
+    ThreadTask task(GlobalObjects::workThread);
+    task.RunOnce([=](){
+        QSqlQuery query(DBManager::instance()->getDB(DBManager::Bangumi));
+        query.prepare("SELECT COUNT(*) FROM anime WHERE Anime=?");
+        query.bindValue(0, animeName);
+        query.exec();
+        if (query.next() && query.value(0).toInt() == 0)
+        {
+            query.prepare("INSERT INTO anime(Anime, AddTime) VALUES(?, ?)");
+            query.bindValue(0, animeName);
+            query.bindValue(1, QDateTime::currentDateTime().toSecsSinceEpoch());
+            query.exec();
+        }
+    });
+}
+
 void AnimeWorker::saveCapture(const QString &animeName, const QString &info, const QImage &image)
 {
     ThreadTask task(GlobalObjects::workThread);

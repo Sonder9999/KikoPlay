@@ -2950,22 +2950,43 @@ void PlayerWindow::keyPressEvent(QKeyEvent *event)
                 }
                 showMessage(tr("Capture has been add to library: %1").arg(curItem->animeTitle));
             }
-            // ====== Unrecognized local video: auto-save to video directory ======
+            // ====== Unrecognized local video: save to library under unified group ======
             else if(!curFile.isEmpty() && QFileInfo(curFile).isFile())
             {
-                QString videoDir = QFileInfo(curFile).absolutePath();
-                QString baseName = QFileInfo(curFile).completeBaseName();
-                QString fileName = QString("%1_%2").arg(baseName, timeTag);
+                QString groupName = tr("Unsorted Captures");
+                QString videoTitle = QFileInfo(curFile).completeBaseName();
+                QString info = QString("%1 - %2").arg(timeTag, videoTitle);
 
-                QString path1 = QDir(videoDir).filePath(fileName + ".jpg");
-                GlobalObjects::mpvplayer->screenshot(path1, "video");
+                AnimeWorker::instance()->ensureAnimeExists(groupName);
+
+#ifdef Q_OS_MAC
+                QTemporaryFile tmpImg(QDir::tempPath() + "/kikoXXXXXX.jpg");
+#else
+                QTemporaryFile tmpImg("XXXXXX.jpg");
+#endif
+                if(tmpImg.open())
+                {
+                    GlobalObjects::mpvplayer->screenshot(tmpImg.fileName(), "video");
+                    QImage captureImage(tmpImg.fileName());
+                    AnimeWorker::instance()->saveCapture(groupName, info, captureImage);
+                }
 
                 if(GlobalObjects::mpvplayer->hasVisibleSubtitle())
                 {
-                    QString path2 = QDir(videoDir).filePath(fileName + "_sub.jpg");
-                    GlobalObjects::mpvplayer->screenshot(path2, "subtitles");
+#ifdef Q_OS_MAC
+                    QTemporaryFile tmpImgSub(QDir::tempPath() + "/kikoXXXXXX.jpg");
+#else
+                    QTemporaryFile tmpImgSub("XXXXXX.jpg");
+#endif
+                    if(tmpImgSub.open())
+                    {
+                        GlobalObjects::mpvplayer->screenshot(tmpImgSub.fileName(), "subtitles");
+                        QImage captureImageSub(tmpImgSub.fileName());
+                        AnimeWorker::instance()->saveCapture(groupName,
+                            info + tr("[Subtitle]"), captureImageSub);
+                    }
                 }
-                showMessage(tr("Saved to: %1").arg(videoDir));
+                showMessage(tr("Capture has been add to library: %1").arg(groupName));
             }
             // ====== Network video or other: fallback to Capture dialog ======
             else

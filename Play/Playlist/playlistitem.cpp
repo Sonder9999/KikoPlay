@@ -131,7 +131,7 @@ PlayListItem *PlayListItem::parseItem(QXmlStreamReader &reader, PlayListItem *pa
     if (hasTrackInfo)
     {
         if(attrs.hasAttribute(XML_FIELD_TRACK_SUB_DELAY))
-            trackInfo.subDelay = attrs.value(XML_FIELD_TRACK_SUB_DELAY).toInt();
+            trackInfo.subDelay = attrs.value(XML_FIELD_TRACK_SUB_DELAY).toDouble();
         if(attrs.hasAttribute(XML_FIELD_TRACK_AUDIO_INDEX))
             trackInfo.audioIndex = attrs.value(XML_FIELD_TRACK_AUDIO_INDEX).toInt();
         if(attrs.hasAttribute(XML_FIELD_TRACK_SUB_INDEX))
@@ -177,7 +177,7 @@ void PlayListItem::writeItem(QXmlStreamWriter &writer, PlayListItem *item)
         writer.writeAttribute(XML_FIELD_ADD_TIME, QString::number(item->addTime));
     if (item->trackInfo)
     {
-        if(item->trackInfo->subDelay != 0)
+        if(!qFuzzyIsNull(item->trackInfo->subDelay))
             writer.writeAttribute(XML_FIELD_TRACK_SUB_DELAY, QString::number(item->trackInfo->subDelay));
         if(item->trackInfo->audioIndex > -1)
             writer.writeAttribute(XML_FIELD_TRACK_AUDIO_INDEX, QString::number(item->trackInfo->audioIndex));

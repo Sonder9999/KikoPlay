@@ -126,7 +126,7 @@ signals:
     void stateChanged(PlayState state);
     void trackInfoChange(TrackType type);
     void chapterChanged();
-    void subDelayChanged(int value);
+    void subDelayChanged(double value);
     void speedChanged(double value);
     void brightnessChanged(int value);
     void contrastChanged(int value);
@@ -159,7 +159,7 @@ public slots:
     void clearExternalAudio();
     void setTrackId(TrackType type, int index);
     void hideSubtitle(bool on);
-    void setSubDelay(int delay);
+    void setSubDelay(double delay);
     void clearExternalSub();
     void setSpeed(double speed);
     void setVideoAspect(int index);

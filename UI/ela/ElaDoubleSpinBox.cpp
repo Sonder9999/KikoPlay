@@ -13,7 +13,8 @@ ElaDoubleSpinBox::ElaDoubleSpinBox(QWidget* parent)
     Q_D(ElaDoubleSpinBox);
     d->q_ptr = this;
     setFixedSize(120, 30);
-    setStyle(new ElaSpinBoxStyle(style()));
+    d->_spinStyle = new ElaSpinBoxStyle(style());
+    setStyle(d->_spinStyle);
     lineEdit()->setAlignment(Qt::AlignCenter);
     lineEdit()->setStyleSheet("background-color:transparent");
     connect(eTheme, &ElaTheme::themeModeChanged, this, [=](ElaThemeType::ThemeMode themeMode) {
@@ -38,6 +39,17 @@ ElaDoubleSpinBox::ElaDoubleSpinBox(QWidget* parent)
 
 ElaDoubleSpinBox::~ElaDoubleSpinBox()
 {
+}
+
+void ElaDoubleSpinBox::setSelfTheme(ElaSelfTheme *selfTheme)
+{
+    Q_D(ElaDoubleSpinBox);
+    d->_spinStyle->setSelfTheme(selfTheme);
+}
+
+QLineEdit *ElaDoubleSpinBox::getLineEdit()
+{
+    return lineEdit();
 }
 
 void ElaDoubleSpinBox::contextMenuEvent(QContextMenuEvent* event)

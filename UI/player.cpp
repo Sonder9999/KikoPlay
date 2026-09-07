@@ -4,6 +4,7 @@
 #include <QFontComboBox>
 #include <QSlider>
 #include <QSpinBox>
+#include <QDoubleSpinBox>
 #include <QFileDialog>
 #include <QActionGroup>
 #include <QApplication>
@@ -48,6 +49,7 @@
 #include "widgets/optionmenu.h"
 #include "ela/ElaToolButton.h"
 #include "ela/ElaSpinBox.h"
+#include "ela/ElaDoubleSpinBox.h"
 #include "ela/ElaSlider.h"
 #include "ela/ElaToggleSwitch.h"
 #include "ela/ElaTheme.h"
@@ -575,10 +577,12 @@ void PlayerWindow::setTrackPage(OptionMenuPanel *rootPanel)
     subPanel->addSpliter();
     OptionMenuItem *subDelayMenu = subPanel->addMenu(tr("Subtitle Delay(s)"));
     subDelayMenu->setSelectAble(false);
-    ElaSpinBox *delaySpinBox = new ElaSpinBox(subDelayMenu);
+    ElaDoubleSpinBox *delaySpinBox = new ElaDoubleSpinBox(subDelayMenu);
     delaySpinBox->setSelfTheme(spinSelfTheme);
     delaySpinBox->getLineEdit()->setObjectName(QStringLiteral("DelaySpinLineEdit"));
-    delaySpinBox->setRange(INT_MIN,INT_MAX);
+    delaySpinBox->setRange(-86400.0, 86400.0);
+    delaySpinBox->setSingleStep(0.1);
+    delaySpinBox->setDecimals(2);
     subDelayMenu->setWidget(delaySpinBox);
     OptionMenuItem *hideSubMenu = subPanel->addMenu(tr("Hide Sub"));
     OptionMenuItem *clearSubMenu = subPanel->addMenu(tr("Clear External Sub Files"));
@@ -603,11 +607,11 @@ void PlayerWindow::setTrackPage(OptionMenuPanel *rootPanel)
         if (restorePlayState) GlobalObjects::mpvplayer->setState(MPVPlayer::Play);
     });
 
-    QObject::connect(delaySpinBox,&QSpinBox::editingFinished,[delaySpinBox](){
+    QObject::connect(delaySpinBox, &QDoubleSpinBox::editingFinished, [delaySpinBox](){
         GlobalObjects::mpvplayer->setSubDelay(delaySpinBox->value());
         GlobalObjects::playlist->setCurrentSubDelay(delaySpinBox->value());
     });
-    QObject::connect(GlobalObjects::mpvplayer, &MPVPlayer::subDelayChanged, delaySpinBox, &QSpinBox::setValue);
+    QObject::connect(GlobalObjects::mpvplayer, &MPVPlayer::subDelayChanged, delaySpinBox, &QDoubleSpinBox::setValue);
 
     QObject::connect(hideSubMenu, &OptionMenuItem::click, this, [=](){
         GlobalObjects::mpvplayer->hideSubtitle(true);

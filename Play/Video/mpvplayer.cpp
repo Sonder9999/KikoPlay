@@ -199,7 +199,7 @@ MPVPlayer::MPVPlayer(QWidget *parent) : QOpenGLWidget(parent),state(PlayState::S
     mpv_observe_property(mpv, 0, "eof-reached", MPV_FORMAT_FLAG);
     mpv_observe_property(mpv, 0, "track-list", MPV_FORMAT_NODE);
     mpv_observe_property(mpv, 0, "chapter-list", MPV_FORMAT_NODE);
-    mpv_observe_property(mpv, 0, "sub-delay", MPV_FORMAT_INT64);
+    mpv_observe_property(mpv, 0, "sub-delay", MPV_FORMAT_DOUBLE);
     mpv_observe_property(mpv, 0, "speed", MPV_FORMAT_DOUBLE);
     mpv_observe_property(mpv, 0, "brightness", MPV_FORMAT_INT64);
     mpv_observe_property(mpv, 0, "contrast", MPV_FORMAT_INT64);
@@ -597,7 +597,7 @@ void MPVPlayer::hideSubtitle(bool on)
     setMPVProperty("sub-visibility",on?"no":"yes");
 }
 
-void MPVPlayer::setSubDelay(int delay)
+void MPVPlayer::setSubDelay(double delay)
 {
     setMPVProperty("sub-delay",delay);
 }
@@ -1101,8 +1101,8 @@ void MPVPlayer::handle_mpv_event(mpv_event *event)
         "sub-delay",
         [this](mpv_event *event){
             mpv_event_property *prop = (mpv_event_property *)event->data;
-            if (prop->format == MPV_FORMAT_INT64) {
-                int64_t sub_delay = *(int64_t *)prop->data;
+            if (prop->format == MPV_FORMAT_DOUBLE) {
+                double sub_delay = *(double *)prop->data;
                 emit subDelayChanged(sub_delay);
             }
         }

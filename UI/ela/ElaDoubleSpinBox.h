@@ -6,6 +6,7 @@
 #include "stdafx.h"
 
 class ElaDoubleSpinBoxPrivate;
+class ElaSelfTheme;
 class ElaDoubleSpinBox : public QDoubleSpinBox
 {
     Q_OBJECT
@@ -13,6 +14,8 @@ class ElaDoubleSpinBox : public QDoubleSpinBox
 public:
     explicit ElaDoubleSpinBox(QWidget* parent = nullptr);
     ~ElaDoubleSpinBox();
+    void setSelfTheme(ElaSelfTheme *selfTheme);
+    QLineEdit *getLineEdit();
 
 protected:
     void contextMenuEvent(QContextMenuEvent* event) override;

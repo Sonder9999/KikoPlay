@@ -8,7 +8,7 @@ class QXmlStreamReader;
 class QXmlStreamWriter;
 struct ItemTrackInfo
 {
-    int subDelay = 0;
+    double subDelay = 0.0;
     int subIndex = -1;
     int audioIndex = -1;
     QStringList subFiles;

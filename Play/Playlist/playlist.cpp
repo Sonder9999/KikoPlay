@@ -1519,7 +1519,7 @@ void PlayList::clearCurrentSub()
     if(!currentItem) return;
     if(!currentItem->trackInfo) return;
     currentItem->trackInfo->subFiles.clear();
-    if(currentItem->trackInfo->subDelay == 0 && currentItem->trackInfo->audioFiles.isEmpty())
+    if(qFuzzyIsNull(currentItem->trackInfo->subDelay) && currentItem->trackInfo->audioFiles.isEmpty())
     {
         delete currentItem->trackInfo;
         currentItem->trackInfo = nullptr;
@@ -1529,14 +1529,14 @@ void PlayList::clearCurrentSub()
     d->incModifyCounter();
 }
 
-void PlayList::setCurrentSubDelay(int delay)
+void PlayList::setCurrentSubDelay(double delay)
 {
     Q_D(PlayList);
     PlayListItem *currentItem=d->currentItem;
     if(!currentItem) return;
     if(!currentItem->trackInfo)
     {
-        if(delay == 0) return;
+        if(qFuzzyIsNull(delay)) return;
         currentItem->trackInfo = new ItemTrackInfo;
     }
     currentItem->trackInfo->subDelay = delay;
@@ -1585,7 +1585,7 @@ void PlayList::clearCurrentAudio()
     if(!currentItem) return;
     if(!currentItem->trackInfo) return;
     currentItem->trackInfo->audioFiles.clear();
-    if(currentItem->trackInfo->subDelay == 0 && currentItem->trackInfo->subFiles.isEmpty())
+    if(qFuzzyIsNull(currentItem->trackInfo->subDelay) && currentItem->trackInfo->subFiles.isEmpty())
     {
         delete currentItem->trackInfo;
         currentItem->trackInfo = nullptr;

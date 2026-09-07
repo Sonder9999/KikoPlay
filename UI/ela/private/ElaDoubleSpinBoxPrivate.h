@@ -6,6 +6,7 @@
 #include "../stdafx.h"
 class ElaMenu;
 class ElaDoubleSpinBox;
+class ElaSpinBoxStyle;
 class ElaDoubleSpinBoxPrivate : public QObject
 {
     Q_OBJECT
@@ -15,6 +16,7 @@ public:
     ~ElaDoubleSpinBoxPrivate();
 
 private:
+    ElaSpinBoxStyle* _spinStyle{nullptr};
     ElaMenu* _createStandardContextMenu();
 };
 

@@ -118,7 +118,7 @@ public slots :
     void setCurrentPlayTime();
     void addCurrentSub(const QString &subFile);
     void clearCurrentSub();
-    void setCurrentSubDelay(int delay);
+    void setCurrentSubDelay(double delay);
     void setCurrentSubIndex(int index);
     void addCurrentAudio(const QString &audioFile);
     void clearCurrentAudio();

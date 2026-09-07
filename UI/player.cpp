@@ -2920,6 +2920,7 @@ void PlayerWindow::keyPressEvent(QKeyEvent *event)
             if(curItem && !curItem->animeTitle.isEmpty())
             {
                 QString info=QString("%1 - %2").arg(timeTag, curItem->title);
+                bool hasSub = GlobalObjects::mpvplayer->hasVisibleSubtitle();
 
 #ifdef Q_OS_MAC
                 QTemporaryFile tmpImg(QDir::tempPath() + "/kikoXXXXXX.jpg");
@@ -2933,7 +2934,7 @@ void PlayerWindow::keyPressEvent(QKeyEvent *event)
                     AnimeWorker::instance()->saveCapture(curItem->animeTitle, info, captureImage);
                 }
 
-                if(GlobalObjects::mpvplayer->hasVisibleSubtitle())
+                if(hasSub)
                 {
 #ifdef Q_OS_MAC
                     QTemporaryFile tmpImgSub(QDir::tempPath() + "/kikoXXXXXX.jpg");
@@ -2956,6 +2957,7 @@ void PlayerWindow::keyPressEvent(QKeyEvent *event)
                 QString groupName = tr("Unsorted Captures");
                 QString videoTitle = QFileInfo(curFile).completeBaseName();
                 QString info = QString("%1 - %2").arg(timeTag, videoTitle);
+                bool hasSub = GlobalObjects::mpvplayer->hasVisibleSubtitle();
 
                 AnimeWorker::instance()->ensureAnimeExists(groupName);
 
@@ -2971,7 +2973,7 @@ void PlayerWindow::keyPressEvent(QKeyEvent *event)
                     AnimeWorker::instance()->saveCapture(groupName, info, captureImage);
                 }
 
-                if(GlobalObjects::mpvplayer->hasVisibleSubtitle())
+                if(hasSub)
                 {
 #ifdef Q_OS_MAC
                     QTemporaryFile tmpImgSub(QDir::tempPath() + "/kikoXXXXXX.jpg");

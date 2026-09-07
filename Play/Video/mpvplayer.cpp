@@ -645,7 +645,46 @@ bool MPVPlayer::hasVisibleSubtitle() const
     if (subTracks.isEmpty()) return false;
     int sid = mpv::qt::get_property(mpv, "sid").toInt();
     if (sid <= 0) return false;
-    return mpv::qt::get_property(mpv, "sub-visibility").toBool();
+    if (!mpv::qt::get_property(mpv, "sub-visibility").toBool()) return false;
+
+    // 检查当前是否有正在显示的字幕文本 (ASS, SRT, VTT 等)
+    QString subText = mpv::qt::get_property(mpv, "sub-text").toString().trimmed();
+    if (!subText.isEmpty()) return true;
+
+    // 检查次字幕文本
+    QString secSubText = mpv::qt::get_property(mpv, "secondary-sub-text").toString().trimmed();
+    if (!secSubText.isEmpty()) return true;
+
+    // 针对图形字幕 (如 PGS, VobSub) 或纯图形事件，检查时间戳区间
+    QVariant subStart = mpv::qt::get_property(mpv, "sub-start");
+    if (subStart.isValid() && !subStart.isNull())
+    {
+        double curTime = getTime();
+        double start = subStart.toDouble();
+        QVariant subEnd = mpv::qt::get_property(mpv, "sub-end");
+        if (subEnd.isValid() && !subEnd.isNull())
+        {
+            double end = subEnd.toDouble();
+            if (curTime >= start - 0.1 && curTime <= end + 0.1)
+                return true;
+        }
+    }
+
+    QVariant secSubStart = mpv::qt::get_property(mpv, "secondary-sub-start");
+    if (secSubStart.isValid() && !secSubStart.isNull())
+    {
+        double curTime = getTime();
+        double start = secSubStart.toDouble();
+        QVariant secSubEnd = mpv::qt::get_property(mpv, "secondary-sub-end");
+        if (secSubEnd.isValid() && !secSubEnd.isNull())
+        {
+            double end = secSubEnd.toDouble();
+            if (curTime >= start - 0.1 && curTime <= end + 0.1)
+                return true;
+        }
+    }
+
+    return false;
 }
 
 void MPVPlayer::setBrightness(int val)

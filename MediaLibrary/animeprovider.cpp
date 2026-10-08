@@ -227,7 +227,7 @@ ScriptState AnimeProvider::kMatch(const QString &scriptId, const QString &path, 
             MatchResult scriptMatchResult;
             ScriptState rsp = script->match(path, scriptMatchResult);
             QThread::msleep(400);  // wait KService 400ms
-            if (scriptRsp && !statusFlag->downFlag)
+            if (rsp && !statusFlag->downFlag)
             {
                 statusFlag->downFlag = true;
                 statusFlag->scriptSuccess = true;

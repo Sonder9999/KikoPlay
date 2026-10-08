@@ -31,6 +31,7 @@
 #include "appframelessdialog.h"
 #include "Common/threadtask.h"
 #include "Common/logger.h"
+#include "Common/network.h"
 #include "Common/kstats.h"
 #include "Common/eventbus.h"
 #include "globalobjects.h"
@@ -562,9 +563,12 @@ void KApp::setEnvInfo()
     lua_rawset(L, -3); //table
 
 #ifdef KSERVICE
-    lua_pushstring(L, "kservice"); // table key
-    lua_pushboolean(L, 1);  // tabel key value
-    lua_rawset(L, -3); //table
+    if (Network::kDanDanAppId[0] != '\0' && Network::kDanDanAppSecret[0] != '\0')
+    {
+        lua_pushstring(L, "kservice"); // table key
+        lua_pushboolean(L, 1);  // tabel key value
+        lua_rawset(L, -3); //table
+    }
 #endif
 
     lua_pushstring(L, "data_path"); // table key

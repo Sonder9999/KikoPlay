@@ -395,6 +395,7 @@ void KService::listenMatchDown(const EventParam *p)
 void KService::listenDanmuAdded(const EventParam *p)
 {
     if (!p || p->eventType != EventBus::EVENT_DANMU_SRC_ADDED) return;
+    if (Network::kKikoAppId[0] == '\0' || Network::kKikoAppSecret[0] == '\0') return;
     kservice::AddDanmuSourceEvent dmSrcEvent;
     setEventHeader(*dmSrcEvent.mutable_header(), "dm_src");
 
@@ -462,6 +463,7 @@ void KService::listenDanmuAdded(const EventParam *p)
 void KService::listenCommonEvents(const EventParam *p)
 {
     if (!p) return;
+    if (Network::kKikoAppId[0] == '\0' || Network::kKikoAppSecret[0] == '\0') return;
     if (p->eventType == EventBus::EVENT_KAPP_LOADED)
     {
         const qint64 lastTs = serviceData->value(SERVICE_KEY_DAY_FIRST_APP_START_TIME, 0).toLongLong();
@@ -488,6 +490,7 @@ void KService::listenCommonEvents(const EventParam *p)
 void KService::listenDanmuSrcRemoved(const EventParam *p)
 {
     if (!p || p->eventType != EventBus::EVENT_DANMU_SRC_REMOVED) return;
+    if (Network::kKikoAppId[0] == '\0' || Network::kKikoAppSecret[0] == '\0') return;
     kservice::RemoveSourceEvent rmSrcEvent;
     setEventHeader(*rmSrcEvent.mutable_header(), "rm_src");
 
@@ -518,6 +521,7 @@ void KService::listenDanmuSrcRemoved(const EventParam *p)
 void KService::listenAnimeFetched(const EventParam *p)
 {
     if (!p || p->eventType != EventBus::EVENT_ANIME_INFO_FETCHED) return;
+    if (Network::kKikoAppId[0] == '\0' || Network::kKikoAppSecret[0] == '\0') return;
     const QVariantMap params = p->param.toMap();
     const QString scriptId = params["scriptId"].toString();
     if (!isInterestLibrarySource(scriptId)) return;
@@ -704,6 +708,7 @@ QString KService::isValidPassword(const QString &password) const
 
 bool KService::enableKServiceMatch() const
 {
+    if (Network::kKikoAppId[0] == '\0' || Network::kKikoAppSecret[0] == '\0') return false;
     return serviceData->value(SERVICE_KEY_ENABLE_K_MATCH, true).toBool();
 }
 
@@ -714,6 +719,7 @@ void KService::setEnableKServiceMatch(bool on)
 
 bool KService::enableKServiceAutoAddDanmuSrc() const
 {
+    if (Network::kKikoAppId[0] == '\0' || Network::kKikoAppSecret[0] == '\0') return false;
     return serviceData->value(SERVICE_KEY_AUTO_ADD_DM_SRC, true).toBool();
 }
 
@@ -724,6 +730,7 @@ void KService::setEnableKServiceAutoAddDanmuSrc(bool on)
 
 bool KService::enableKServiceUpdatSrc() const
 {
+    if (Network::kKikoAppId[0] == '\0' || Network::kKikoAppSecret[0] == '\0') return false;
     return serviceData->value(SERVICE_KEY_ENABLE_UPDATE_SRC, true).toBool();
 }
 
@@ -779,6 +786,7 @@ bool KService::isInterestLibrarySource(const QString &scriptId) const
 
 void KService::kStatsUV(bool isStartup)
 {
+    if (Network::kKikoAppId[0] == '\0' || Network::kKikoAppSecret[0] == '\0') return;
     const qint64 lastTs = serviceData->value(SERVICE_KEY_DAY_FIRST_START_TIME, 0).toLongLong();
     const QDate lastDate = QDateTime::fromSecsSinceEpoch(lastTs).date();
     const QDate curDate = QDate::currentDate();
@@ -810,6 +818,11 @@ void KService::kStatsUV(bool isStartup)
 
 void KService::kFileReco(const QString &path)
 {
+    if (Network::kKikoAppId[0] == '\0' || Network::kKikoAppSecret[0] == '\0')
+    {
+        emit recognized(0, "KService credentials not configured", path, MatchResult());
+        return;
+    }
     QFileInfo fi(path);
     if (!fi.isFile() || !fi.exists() || fi.size() < 1024*1024)
     {

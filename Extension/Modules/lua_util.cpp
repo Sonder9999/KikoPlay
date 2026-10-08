@@ -367,9 +367,12 @@ int LuaUtil::envInfo(lua_State *L)
     lua_rawset(L, -3); //table
 
 #ifdef KSERVICE
-    lua_pushstring(L, "kservice"); // table key
-    lua_pushboolean(L, 1);  // tabel key value
-    lua_rawset(L, -3); //table
+    if (Network::kDanDanAppId[0] != '\0' && Network::kDanDanAppSecret[0] != '\0')
+    {
+        lua_pushstring(L, "kservice"); // table key
+        lua_pushboolean(L, 1);  // tabel key value
+        lua_rawset(L, -3); //table
+    }
 #endif
 
     return 1;
